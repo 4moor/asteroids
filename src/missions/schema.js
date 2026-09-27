@@ -16,6 +16,9 @@ export function validateMission(value) {
   return Object.freeze({
     id: value.id, title: value.title.trim(), description: value.description.trim(),
     seed: value.seed, asteroidCount: value.asteroidCount, asteroidSpeed: value.asteroidSpeed,
+    mode: value.mode ?? 'waves',
+    durationSeconds: value.durationSeconds ?? 60,
+    spawnIntervalSeconds: value.spawnIntervalSeconds ?? 1.25,
   });
 }
 

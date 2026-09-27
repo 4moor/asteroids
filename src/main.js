@@ -1,5 +1,5 @@
 import './style.css';
-import { createGame, stepGame } from './game/core.js';
+import { createGame, stepGame, WORLD, RADII } from './game/core.js';
 import { createRenderer } from './render.js';
 import { missions } from './missions/catalog.js';
 
@@ -11,7 +11,11 @@ const pauseButton = document.querySelector('#pause');
 const status = document.querySelector('[data-testid="game-status"]');
 const score = document.querySelector('[data-testid="score"]');
 const lives = document.querySelector('[data-testid="lives"]');
-const wave = document.querySelector('[data-testid="wave"]');
+const fieldValue = document.querySelector('[data-testid="field-value"]');
+const fieldLabel = document.querySelector('#field-label');
+const objective = document.querySelector('[data-testid="objective"]');
+const objectiveProgress = document.querySelector('[data-testid="objective-progress"]');
+const missionProgress = document.querySelector('#mission-progress');
 const overlayTitle = document.querySelector('#overlay-title');
 const overlayCopy = document.querySelector('#overlay-copy');
 const overlayTag = document.querySelector('#overlay-tag');
@@ -44,18 +48,38 @@ function input() {
 function updateHud() {
   score.textContent = state.score;
   lives.textContent = state.lives;
-  wave.textContent = state.wave;
+  const legacy = state.settings.mode === 'waves';
+  fieldLabel.textContent = legacy ? 'ВОЛНА' : 'АСТЕРОИДЫ';
+  fieldValue.textContent = legacy ? state.wave : state.asteroids.filter(rock => rock.x + RADII[rock.size] >= 0 && rock.x - RADII[rock.size] <= WORLD.width).length;
+  missionProgress.hidden = legacy;
+  if (state.settings.mode === 'clear') {
+    const total = state.settings.asteroidCount * 7;
+    objective.textContent = 'Очистите одну волну';
+    objectiveProgress.textContent = 'Попадания: ' + state.destroyed + ' / ' + total;
+    missionProgress.max = total;
+    missionProgress.value = state.destroyed;
+  } else if (state.settings.mode === 'survival') {
+    objective.textContent = 'Продержитесь ' + state.settings.durationSeconds + ' секунд';
+    objectiveProgress.textContent = 'Осталось ' + Math.ceil(Math.max(0, state.settings.durationSeconds - state.elapsed)) + ' с';
+    missionProgress.max = state.settings.durationSeconds;
+    missionProgress.value = state.elapsed;
+  } else {
+    objective.textContent = 'Продержитесь как можно дольше';
+    objectiveProgress.textContent = 'Волна ' + state.wave;
+  }
 }
 
 function finish() {
   missionPicker.disabled = false;
   mode = 'ended';
   held.clear();
-  status.textContent = 'Полёт завершён';
-  overlayTitle.textContent = 'Полёт завершён';
-  overlayTag.textContent = 'РАЗБОР ВЫЛЕТА';
-  overlayCopy.textContent = 'Ваш результат: ' + state.score + ' очков. Волна: ' + state.wave + '. Ещё одна попытка?';
-  startButton.textContent = 'Начать заново';
+  const won = state.status === 'won';
+  status.textContent = won ? 'Миссия выполнена' : 'Полёт завершён';
+  overlayTitle.textContent = status.textContent;
+  overlayTag.textContent = won ? 'ЦЕЛЬ ДОСТИГНУТА' : 'РАЗБОР ВЫЛЕТА';
+  const result = state.settings.mode === 'survival' ? 'Вы выдержали весь поток.' : 'Сектор очищен.';
+  overlayCopy.textContent = (won ? result + ' ' : '') + 'Ваш результат: ' + state.score + ' очков.';
+  startButton.textContent = won ? 'Повторить миссию' : 'Начать заново';
   pauseButton.disabled = true;
   overlay.hidden = false;
   startButton.focus();
@@ -64,7 +88,7 @@ function finish() {
 function advance(controls = input(), dt = 1 / 60) {
   state = stepGame(state, controls, dt);
   updateHud();
-  if (state.status === 'gameover' && mode === 'playing') finish();
+  if (state.status !== 'playing' && mode === 'playing') finish();
 }
 
 function start() {
@@ -94,7 +118,8 @@ function togglePause() {
 function updateMissionBriefing() {
   document.querySelector('#mission-title').textContent = settings.title;
   document.querySelector('#mission-description').textContent = settings.description;
-  document.querySelector('#mission-difficulty').textContent = settings.asteroidCount + ' / ×' + settings.asteroidSpeed;
+  document.querySelector('#mission-difficulty').textContent = settings.mode === 'clear' ? 'Одна волна' : settings.mode === 'survival' ? 'Поток · ' + settings.durationSeconds + ' с' : 'Бесконечные волны';
+  overlayCopy.textContent = settings.description;
   document.querySelector('#flight-label').textContent = 'МИССИЯ / ' + settings.title.toUpperCase();
 }
 

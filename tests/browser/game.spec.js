@@ -60,7 +60,7 @@ test('a reproducible hit updates score in the DOM', async ({ page }) => {
   await expect(page.getByTestId('score')).toHaveText('100');
 });
 
-test('game over and restart reset score, lives and wave', async ({ page }) => {
+test('game over and restart reset score, lives and asteroid count', async ({ page }) => {
   await page.getByRole('button', { name: 'Начать полёт', exact: true }).click();
   await page.evaluate(() => {
     const api = window.__ASTEROIDS_TEST__;
@@ -77,7 +77,7 @@ test('game over and restart reset score, lives and wave', async ({ page }) => {
   await page.getByRole('button', { name: 'Начать заново', exact: true }).click();
   await expect(page.getByTestId('score')).toHaveText('0');
   await expect(page.getByTestId('lives')).toHaveText('3');
-  await expect(page.getByTestId('wave')).toHaveText('1');
+  await expect(page.getByTestId('field-value')).toHaveText('3');
 });
 
 test('layout stays within a narrow viewport', async ({ page }) => {
