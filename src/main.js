@@ -1,6 +1,7 @@
 import './style.css';
 import { createGame, stepGame } from './game/core.js';
 import { createRenderer } from './render.js';
+import { missions } from './missions/catalog.js';
 
 const canvas = document.querySelector('#game');
 const render = createRenderer(canvas);
@@ -14,7 +15,17 @@ const wave = document.querySelector('[data-testid="wave"]');
 const overlayTitle = document.querySelector('#overlay-title');
 const overlayCopy = document.querySelector('#overlay-copy');
 const overlayTag = document.querySelector('#overlay-tag');
-let settings = { seed: 42, asteroidCount: 5, asteroidSpeed: 1 };
+const missionPicker = document.createElement('select');
+missionPicker.setAttribute('aria-label', 'Миссия');
+for (const mission of missions) {
+  const option = document.createElement('option');
+  option.value = mission.id;
+  option.textContent = mission.title;
+  missionPicker.append(option);
+}
+document.querySelector('#mission-picker').append(missionPicker);
+let settings = missions.find(mission => mission.id === 'first-flight') || missions[0];
+missionPicker.value = settings.id;
 let state = createGame(settings);
 let mode = 'ready';
 const held = new Set();
@@ -37,6 +48,7 @@ function updateHud() {
 }
 
 function finish() {
+  missionPicker.disabled = false;
   mode = 'ended';
   held.clear();
   status.textContent = 'Полёт завершён';
@@ -56,6 +68,7 @@ function advance(controls = input(), dt = 1 / 60) {
 }
 
 function start() {
+  missionPicker.disabled = true;
   state = createGame(settings);
   mode = 'playing';
   accumulator = 0;
@@ -78,6 +91,29 @@ function togglePause() {
   if (mode === 'playing') canvas.focus();
 }
 
+function updateMissionBriefing() {
+  document.querySelector('#mission-title').textContent = settings.title;
+  document.querySelector('#mission-description').textContent = settings.description;
+  document.querySelector('#mission-difficulty').textContent = settings.asteroidCount + ' / ×' + settings.asteroidSpeed;
+  document.querySelector('#flight-label').textContent = 'МИССИЯ / ' + settings.title.toUpperCase();
+}
+
+missionPicker.addEventListener('change', () => {
+  settings = missions.find(mission => mission.id === missionPicker.value);
+  state = createGame(settings);
+  mode = 'ready';
+  held.clear();
+  accumulator = 0;
+  overlayTitle.textContent = 'Готовы к вылету?';
+  overlayTag.textContent = 'ПРЕДПОЛЁТНЫЙ БРИФИНГ';
+  overlayCopy.textContent = settings.description;
+  startButton.textContent = 'Начать полёт';
+  overlay.hidden = false;
+  pauseButton.disabled = true;
+  status.textContent = 'Ожидание старта';
+  updateMissionBriefing();
+  updateHud();
+});
 startButton.addEventListener('click', start);
 pauseButton.addEventListener('click', togglePause);
 const gameKeys = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'KeyA', 'KeyD', 'KeyW', 'Space']);
@@ -108,6 +144,7 @@ function frame(timestamp) {
   render(state, mode === 'playing' && input().thrust);
   requestAnimationFrame(frame);
 }
+updateMissionBriefing();
 updateHud();
 requestAnimationFrame(frame);
 
