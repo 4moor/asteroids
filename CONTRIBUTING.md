@@ -6,18 +6,23 @@
 
 ## Начало работы
 
-Создайте форк на GitHub. В примере замените YOUR_LOGIN на свой логин.
+Установите [GitHub CLI](https://cli.github.com/) и один раз выполните
+`gh auth login`. Приглашение в организацию не требуется: форк создаётся
+автоматически в вашем аккаунте.
+
+Из родительской папки будущего проекта:
 
 ```sh
-git clone https://github.com/YOUR_LOGIN/asteroids.git
+gh repo fork asteroids-developers/asteroids --clone --remote
 cd asteroids
-git remote add upstream https://github.com/asteroids-developers/asteroids.git
 git fetch upstream
-git switch main
-git merge --ff-only upstream/main
-git switch -c feat/my-mission
+git switch -c feat/my-mission upstream/main
 npm ci
 ```
+
+`origin` указывает на ваш форк, `upstream` — на общий репозиторий.
+Если вы уже склонировали общий репозиторий, выполните в его корне
+`gh repo fork --remote`, затем создайте рабочую ветку от `upstream/main`.
 
 Перед коммитом посмотрите `git status` и `git diff`.
 Добавляйте конкретные файлы задачи; личные настройки и результаты запусков
@@ -31,7 +36,12 @@ git commit -m "feat: add my mission"
 git push -u origin feat/my-mission
 ```
 
-После push откройте PR с базой `asteroids-developers/asteroids:main`.
+После push откройте PR с базой `asteroids-developers/asteroids:main`:
+
+```sh
+gh pr create --repo asteroids-developers/asteroids --base main
+```
+
 В описании укажите поведение и проверки. Для изменённого интерфейса или
 механики выполните также `npm run test:e2e`.
 
