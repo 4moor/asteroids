@@ -1,16 +1,17 @@
 # These rules apply to matching shell command prefixes outside the sandbox.
 # They are examples of command policy, not a complete authorization boundary.
+# A prompt goes to the active reviewer; auto_review does not guarantee a human prompt.
 prefix_rule(
     pattern = ["git", "push"],
     decision = "prompt",
-    justification = "Confirm the destination branch before publishing changes.",
+    justification = "Review the authorized action and destination branch before publishing changes.",
     match = ["git push origin feat/example"],
     not_match = ["git status", "git fetch origin"],
 )
 prefix_rule(
     pattern = ["gh", "pr", "create"],
     decision = "prompt",
-    justification = "Confirm the target repository and review the PR body.",
+    justification = "Review the authorized action, target repository and PR body.",
     match = ["gh pr create --base main"],
     not_match = ["gh pr view 1"],
 )
