@@ -1,0 +1,4 @@
+# Project defaults. Codex loads this layer only after you trust the project.
+# Model, provider and authentication remain user settings.
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
