@@ -19,8 +19,12 @@
         <div class="telemetry">
           <div class="stat"><span>ОЧКИ</span><output data-testid="score">0</output></div>
           <div class="stat"><span>ЖИЗНИ</span><output data-testid="lives">3</output></div>
-          <div class="stat"><span>ВОЛНА</span><output data-testid="wave">1</output></div>
+          <div class="stat"><span id="field-label">АСТЕРОИДЫ</span><output data-testid="field-value">3</output></div>
           <div class="flight-status"><span class="status-dot"></span><span data-testid="game-status" aria-live="polite">Ожидание старта</span></div>
+        </div>
+        <div class="objective-strip">
+          <div class="objective-summary"><strong data-testid="objective">Очистите одну волну</strong><span data-testid="objective-progress">Попадания: 0 / 21</span></div>
+          <progress id="mission-progress" aria-label="Прогресс миссии" max="21" value="0"></progress>
         </div>
         <div class="arena">
           <canvas id="game" width="960" height="640" tabindex="0" aria-label="Игровое поле. Стрелки или WASD — движение, пробел — огонь.">Для игры нужен браузер с поддержкой Canvas.</canvas>
@@ -41,7 +45,7 @@
           <h2 id="mission-title">Первый вылет</h2>
           <p id="mission-description">Расчистите сектор от астероидов. Каждый разбитый камень приближает следующую волну.</p>
           <div id="mission-picker"></div>
-          <div class="mission-meta"><span>СЛОЖНОСТЬ</span><strong id="mission-difficulty">Базовая</strong></div>
+          <div class="mission-meta"><span>СЦЕНАРИЙ</span><strong id="mission-difficulty">Одна волна</strong></div>
         </section>
         <section class="controls">
           <p class="eyebrow">УПРАВЛЕНИЕ</p>
@@ -49,7 +53,7 @@
           <div class="control-row"><span>Тяга</span><kbd>↑</kbd></div>
           <div class="control-row"><span>Огонь</span><kbd class="wide">Пробел</kbd></div>
           <div class="control-row"><span>Пауза</span><kbd>P</kbd></div>
-          <p class="control-note">Также: A/D — поворот, W — тяга.<br>Края поля соединены между собой.</p>
+          <p class="control-note">Также: A/D — поворот, W — тяга.<br>Корабль проходит сквозь края поля.</p>
         </section>
         <section class="score-guide">
           <p class="eyebrow">ЦЕНА ПОПАДАНИЯ</p>

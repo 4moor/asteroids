@@ -7,9 +7,9 @@ export function createRenderer(canvas) {
   canvas.height = WORLD.height * dpr;
   ctx.scale(dpr, dpr);
 
-  function wrapped(body, draw) {
-    for (const dx of [-WORLD.width, 0, WORLD.width]) {
-      for (const dy of [-WORLD.height, 0, WORLD.height]) {
+  function wrapped(body, draw, repeat = true) {
+    for (const dx of repeat ? [-WORLD.width, 0, WORLD.width] : [0]) {
+      for (const dy of repeat ? [-WORLD.height, 0, WORLD.height] : [0]) {
         ctx.save();
         ctx.translate(body.x + dx, body.y + dy);
         ctx.rotate(body.angle || 0);
@@ -49,11 +49,11 @@ export function createRenderer(canvas) {
           if (vertex === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
         ctx.closePath(); ctx.fill(); ctx.stroke();
-      });
+      }, state.settings.mode !== 'survival');
     }
     ctx.fillStyle = '#ffd29a';
     for (const shot of state.bullets) {
-      wrapped(shot, () => { ctx.beginPath(); ctx.arc(0, 0, 2.5, 0, Math.PI * 2); ctx.fill(); });
+      wrapped(shot, () => { ctx.beginPath(); ctx.arc(0, 0, 2.5, 0, Math.PI * 2); ctx.fill(); }, state.settings.mode !== 'survival');
     }
     if (state.status === 'gameover') return;
     if (state.ship.invulnerable > 0 && Math.floor(state.elapsed * 10) % 2 === 0) return;
@@ -65,6 +65,6 @@ export function createRenderer(canvas) {
       ctx.strokeStyle = '#8bf2c0'; ctx.fillStyle = '#163c33'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(-11, -11); ctx.lineTo(-6, 0); ctx.lineTo(-11, 11); ctx.closePath();
       ctx.fill(); ctx.stroke();
-    });
+    }, state.settings.mode !== 'survival');
   };
 }
