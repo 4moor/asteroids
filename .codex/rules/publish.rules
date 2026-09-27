@@ -1,0 +1,23 @@
+# These rules apply to matching shell command prefixes outside the sandbox.
+# They are examples of command policy, not a complete authorization boundary.
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Confirm the destination branch before publishing changes.",
+    match = ["git push origin feat/example"],
+    not_match = ["git status", "git fetch origin"],
+)
+prefix_rule(
+    pattern = ["gh", "pr", "create"],
+    decision = "prompt",
+    justification = "Confirm the target repository and review the PR body.",
+    match = ["gh pr create --base main"],
+    not_match = ["gh pr view 1"],
+)
+prefix_rule(
+    pattern = ["gh", "pr", "merge"],
+    decision = "prompt",
+    justification = "Verify current CI and the owner's approval or authorized own-PR exception.",
+    match = ["gh pr merge 1 --squash"],
+    not_match = ["gh pr list"],
+)
