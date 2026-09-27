@@ -2,3 +2,5 @@
 # Model, provider and authentication remain user settings.
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
+# Eligible requests go to the automatic reviewer; the sandbox remains in force.
+approvals_reviewer = "auto_review"
