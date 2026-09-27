@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { validateMission, loadMissions } from '../../src/missions/schema.js';
-import { createGame } from '../../src/game/core.js';
+import { createGame, stepGame } from '../../src/game/core.js';
 
 const fixture = { id: 'example', title: 'Пример', description: 'Учебный сектор', seed: 42, asteroidCount: 5, asteroidSpeed: 1 };
 const presets = () => readdirSync(new URL('../../src/missions/presets/', import.meta.url))
@@ -40,4 +40,22 @@ test('invalid mission metadata and numeric settings are rejected', () => {
     { asteroidSpeed: -1 }, { asteroidSpeed: NaN }, { asteroidSpeed: Infinity },
   ]) assert.throws(() => validateMission({ ...fixture, ...changed }));
   for (const value of [null, [], 'mission']) assert.throws(() => validateMission(value));
+});
+
+
+test('mission objectives reach the simulation while old JSON keeps waves', () => {
+  const legacy = createGame(validateMission(fixture));
+  legacy.asteroids = [];
+  assert.equal(stepGame(legacy, {}, 0.01).wave, 2);
+  const clear = createGame(validateMission({ ...fixture, mode: 'clear' }));
+  clear.asteroids = [];
+  assert.equal(stepGame(clear, {}, 0.01).status, 'won');
+  const timed = createGame(validateMission({ ...fixture, mode: 'survival', durationSeconds: 1, spawnIntervalSeconds: 0.5 }));
+  timed.elapsed = 0.99;
+  timed.ship.invulnerable = 10;
+  assert.equal(stepGame(timed, {}, 0.02).status, 'won');
+  assert.equal(timed.settings.spawnIntervalSeconds, 0.5);
+  for (const changed of [{mode:'unknown'}, {mode:null}, {durationSeconds:0}, {spawnIntervalSeconds:0}]) {
+    assert.throws(() => validateMission({ ...fixture, ...changed }));
+  }
 });
