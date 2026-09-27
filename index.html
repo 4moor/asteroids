@@ -1,5 +1,66 @@
 <!doctype html>
 <html lang="ru">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Asteroids — AIDev</title></head>
-<body><main><h1>Asteroids</h1><p>Учебный проект AIDev. Игра появится в следующих PR.</p></main></body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090e18">
+  <meta name="description" content="Asteroids — учебная игра курса AIDev. Управляйте кораблём, разбивайте астероиды и создавайте новые миссии.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3L36 35L20 27L4 35Z' fill='none' stroke='%238bf2c0' stroke-width='3'/%3E%3C/svg%3E">
+  <title>Asteroids — AIDev</title>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div><p class="eyebrow">AIDEV / ЛАБОРАТОРИЯ ПОЛЁТОВ</p><h1>ASTEROIDS<span class="title-dot">.</span></h1></div>
+      <div class="edition"><span class="beacon"></span> ОТКРЫТАЯ ОРБИТА <span class="edition-number">01</span></div>
+    </header>
+    <div class="workspace">
+      <section class="flight-panel" aria-label="Игра">
+        <div class="telemetry">
+          <div class="stat"><span>ОЧКИ</span><output data-testid="score">0</output></div>
+          <div class="stat"><span>ЖИЗНИ</span><output data-testid="lives">3</output></div>
+          <div class="stat"><span>ВОЛНА</span><output data-testid="wave">1</output></div>
+          <div class="flight-status"><span class="status-dot"></span><span data-testid="game-status" aria-live="polite">Ожидание старта</span></div>
+        </div>
+        <div class="arena">
+          <canvas id="game" width="960" height="640" tabindex="0" aria-label="Игровое поле. Стрелки или WASD — движение, пробел — огонь.">Для игры нужен браузер с поддержкой Canvas.</canvas>
+          <section id="overlay" class="overlay" aria-labelledby="overlay-title">
+            <div class="overlay-card">
+              <span id="overlay-tag" class="eyebrow">ПРЕДПОЛЁТНЫЙ БРИФИНГ</span>
+              <h2 id="overlay-title">Готовы к вылету?</h2>
+              <p id="overlay-copy">Три жизни. Бесконечный космос.<br>Держите курс и не забывайте про инерцию.</p>
+              <button id="start" class="button primary">Начать полёт <span aria-hidden="true">↗</span></button>
+            </div>
+          </section>
+        </div>
+        <div class="flight-footer"><span id="flight-label">СЕКТОР 01 / УЧЕБНЫЙ ВЫЛЕТ</span><button id="pause" class="button quiet" disabled>Пауза</button></div>
+      </section>
+      <aside class="sidebar" aria-label="Брифинг и управление">
+        <section class="briefing">
+          <p class="eyebrow">ВАША МИССИЯ</p>
+          <h2 id="mission-title">Первый вылет</h2>
+          <p id="mission-description">Расчистите сектор от астероидов. Каждый разбитый камень приближает следующую волну.</p>
+          <div id="mission-picker"></div>
+          <div class="mission-meta"><span>СЛОЖНОСТЬ</span><strong id="mission-difficulty">Базовая</strong></div>
+        </section>
+        <section class="controls">
+          <p class="eyebrow">УПРАВЛЕНИЕ</p>
+          <div class="control-row"><span>Поворот</span><span><kbd>←</kbd> <kbd>→</kbd></span></div>
+          <div class="control-row"><span>Тяга</span><kbd>↑</kbd></div>
+          <div class="control-row"><span>Огонь</span><kbd class="wide">Пробел</kbd></div>
+          <div class="control-row"><span>Пауза</span><kbd>P</kbd></div>
+          <p class="control-note">Можно использовать WASD.<br>Края поля соединены между собой.</p>
+        </section>
+        <section class="score-guide">
+          <p class="eyebrow">ЦЕНА ПОПАДАНИЯ</p>
+          <div><span>Большой</span><strong>20</strong></div>
+          <div><span>Средний</span><strong>50</strong></div>
+          <div><span>Маленький</span><strong>100</strong></div>
+        </section>
+      </aside>
+    </div>
+    <footer class="page-footer"><span>ПОСТРОЕНО ДЛЯ ЭКСПЕРИМЕНТОВ.</span><a href="https://github.com/asteroids-developers/asteroids">Исходный код <span aria-hidden="true">↗</span></a></footer>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
 </html>
