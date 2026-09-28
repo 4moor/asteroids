@@ -110,6 +110,19 @@ export function createRenderer(canvas) {
     for (const shot of state.bullets) {
       wrapped(shot, () => { ctx.beginPath(); ctx.arc(0, 0, 2.5, 0, Math.PI * 2); ctx.fill(); }, !['survival', 'dream-rally'].includes(state.settings.mode));
     }
+    if (state.ufo) {
+      wrapped(state.ufo, () => {
+        ctx.strokeStyle = '#ff7da9'; ctx.fillStyle = '#48233e'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(0, 3, 25, 8, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(0, -3, 12, 10, 0, Math.PI, 0); ctx.stroke();
+        ctx.fillStyle = '#ffd7ec';
+        for (const x of [-13, 0, 13]) { ctx.beginPath(); ctx.arc(x, 3, 2, 0, Math.PI * 2); ctx.fill(); }
+      }, false);
+    }
+    ctx.fillStyle = '#ff628c';
+    for (const shot of state.enemyBullets) {
+      ctx.beginPath(); ctx.arc(shot.x, shot.y, 5, 0, Math.PI * 2); ctx.fill();
+    }
     if (state.status === 'gameover') return;
     if (state.ship.invulnerable > 0 && Math.floor(state.elapsed * 10) % 2 === 0) return;
     wrapped(state.ship, () => {

@@ -80,8 +80,8 @@ function updateHud() {
     missionProgress.max = total;
     missionProgress.value = state.destroyed;
   } else if (state.settings.mode === 'survival') {
-    objective.textContent = 'Продержитесь ' + state.settings.durationSeconds + ' секунд';
-    objectiveProgress.textContent = 'Осталось ' + Math.ceil(Math.max(0, state.settings.durationSeconds - state.elapsed)) + ' с';
+    objective.textContent = (state.settings.ufoEnabled ? 'Переживите атаку НЛО · ' : 'Продержитесь ') + state.settings.durationSeconds + ' секунд';
+    objectiveProgress.textContent = 'Осталось ' + Math.ceil(Math.max(0, state.settings.durationSeconds - state.elapsed)) + ' с' + (state.settings.ufoEnabled ? ' · НЛО сбито: ' + state.ufosDestroyed : '');
     missionProgress.max = state.settings.durationSeconds;
     missionProgress.value = state.elapsed;
   } else {
@@ -98,7 +98,7 @@ function finish() {
   status.textContent = won ? 'Миссия выполнена' : 'Полёт завершён';
   overlayTitle.textContent = state.rally ? (won ? 'Hi, Barbie! Ты дома.' : 'Вечеринка подождёт') : status.textContent;
   overlayTag.textContent = won ? 'ЦЕЛЬ ДОСТИГНУТА' : 'РАЗБОР ВЫЛЕТА';
-  const result = state.settings.mode === 'survival' ? 'Вы выдержали весь поток.' : 'Сектор очищен.';
+  const result = state.settings.mode === 'survival' ? (state.settings.ufoEnabled ? 'Вы пережили атаку НЛО.' : 'Вы выдержали весь поток.') : 'Сектор очищен.';
   overlayCopy.textContent = state.rally
     ? (won ? 'Приглашения собраны, шторм пройден, Дримхаус спасён от скуки. '
       : state.rally.reason === 'timeout' ? 'Время вышло: портал закрылся. Собирайте сердца — они дают щит и перезаряжают рывок. '

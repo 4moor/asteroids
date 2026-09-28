@@ -3,13 +3,15 @@ import { WORLD, RADII, wrap, toroidalDistance } from './world.js';
 import { makeAsteroid, spawnWave, spawnIncoming } from './spawn.js';
 import { createRally, prepareRally, advanceRally, rallySpawnInterval, RALLY } from './rally.js';
 export { WORLD, RADII, toroidalDistance } from './world.js';
+import { updateUfo, resolveUfoHits } from './ufo.js';
 const POINTS = { 1: 100, 2: 50, 3: 20 };
 const SHIP_RADIUS = 12;
 
 export function validateSettings({
   seed, asteroidCount, asteroidSpeed, mode = 'waves',
-  durationSeconds = 60, spawnIntervalSeconds = 1.25,
+  durationSeconds = 60, spawnIntervalSeconds = 1.25, ufoEnabled = false,
 }) {
+  if (typeof ufoEnabled !== 'boolean' || (ufoEnabled && mode !== 'survival')) throw new TypeError('UFO requires survival mode and a boolean flag');
   if (!['waves', 'clear', 'survival', 'dream-rally'].includes(mode)) throw new TypeError('unknown mission mode');
   if (!Number.isFinite(durationSeconds) || durationSeconds < 1 || durationSeconds > 600) {
     throw new RangeError('durationSeconds must be between 1 and 600');
@@ -29,15 +31,15 @@ export function validateSettings({
 
 export function createGame({
   seed = 1, asteroidCount = 5, asteroidSpeed = 1, mode = 'waves',
-  durationSeconds = 60, spawnIntervalSeconds = 1.25,
+  durationSeconds = 60, spawnIntervalSeconds = 1.25, ufoEnabled = false,
 } = {}) {
-  const settings = { seed, asteroidCount, asteroidSpeed, mode, durationSeconds, spawnIntervalSeconds };
+  const settings = { seed, asteroidCount, asteroidSpeed, mode, durationSeconds, spawnIntervalSeconds, ufoEnabled };
   validateSettings(settings);
   const state = {
     status: 'playing', score: 0, lives: 3, wave: 1, elapsed: 0, destroyed: 0,
     spawnCountdown: spawnIntervalSeconds,
     settings, rng: seed >>> 0, nextId: 1, ship: newShip(),
-    asteroids: [], bullets: [],
+    asteroids: [], bullets: [], ufo: null, enemyBullets: [], ufoCountdown: 2, ufosDestroyed: 0,
   };
   spawnWave(state);
   if (mode === 'dream-rally') state.rally = createRally(state);
@@ -115,10 +117,11 @@ function resolveHits(state) {
   }
   state.bullets = state.bullets.filter(shot => !spent.has(shot.id));
   state.asteroids = state.asteroids.filter(rock => !destroyed.has(rock.id)).concat(fragments);
+  const enemyHit = resolveUfoHits(state);
   if (state.ship.invulnerable > 0) return;
   const hit = state.asteroids.some(rock =>
     distanceToRock(state, state.ship, rock) < SHIP_RADIUS + RADII[rock.size]);
-  if (!hit) return;
+  if (!hit && !enemyHit) return;
   damageShip(state);
 }
 
@@ -169,6 +172,7 @@ export function stepGame(previous, input = {}, dt = 1 / 60) {
     shot.ttl -= dt;
   }
   state.bullets = state.bullets.filter(shot => shot.ttl > 0);
+  updateUfo(state, dt);
   resolveHits(state);
   // Collision loss takes precedence over completing an objective in the same step.
   if (state.status !== 'playing') return state;

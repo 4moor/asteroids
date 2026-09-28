@@ -19,6 +19,7 @@ export function validateMission(value) {
     id: value.id, title: value.title.trim(), description: value.description.trim(),
     seed: value.seed, asteroidCount: value.asteroidCount, asteroidSpeed: value.asteroidSpeed,
     mode: value.mode ?? 'waves',
+    ufoEnabled: value.ufoEnabled ?? false,
     durationSeconds: value.durationSeconds ?? 60,
     spawnIntervalSeconds: value.spawnIntervalSeconds ?? 1.25,
     theme,

@@ -10,7 +10,7 @@ test('Barbie rally pauses, advances through three stages and resets on replay', 
   await page.getByRole('button', { name: 'Начать полёт', exact: true }).click();
   const initial = await page.evaluate(() => window.__ASTEROIDS_TEST__.getState());
   expect(initial.settings).toEqual({ seed: 1959, asteroidCount: 4, asteroidSpeed: 0.9,
-    mode: 'dream-rally', durationSeconds: 90, spawnIntervalSeconds: 2 });
+    mode: 'dream-rally', durationSeconds: 90, spawnIntervalSeconds: 2, ufoEnabled: false });
   await page.evaluate(() => {
     const api = window.__ASTEROIDS_TEST__;
     const state = api.getState();
